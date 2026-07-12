@@ -1,4 +1,9 @@
-const trimSlash = (value: string) => value.replace(/\/+$/, '');
+const normalizeBaseUrl = (value: string) =>
+  value
+    .trim()
+    .replace(/\/+$/, '')
+    .replace(/\.+$/, '')
+    .replace(/\/+$/, '');
 
 interface RuntimeWindowEnv {
   VITE_API_BASE_URL?: string;
@@ -19,7 +24,7 @@ const appendUnique = (list: string[], value: string | null | undefined) => {
   if (!value) {
     return;
   }
-  const normalized = trimSlash(value.trim());
+  const normalized = normalizeBaseUrl(value);
   if (!normalized || list.includes(normalized)) {
     return;
   }
