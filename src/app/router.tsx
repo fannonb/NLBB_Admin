@@ -13,6 +13,7 @@ import { AdminDashboardPage } from '../pages/admin/AdminDashboardPage';
 import { AdminProvidersPage } from '../pages/admin/AdminProvidersPage';
 import { AdminRevenuePage } from '../pages/admin/AdminRevenuePage';
 import { AdminUsersPage } from '../pages/admin/AdminUsersPage';
+import { AdminCategoriesPage } from '../pages/admin/AdminCategoriesPage';
 
 export const router = createBrowserRouter([
   {
@@ -100,6 +101,7 @@ export const router = createBrowserRouter([
           { path: 'dashboard', element: <AdminDashboardPage /> },
           { path: 'users', element: <AdminUsersPage /> },
           { path: 'providers', element: <AdminProvidersPage /> },
+          { path: 'categories', element: <AdminCategoriesPage /> },
           { path: 'revenue', element: <AdminRevenuePage /> },
         ],
       },

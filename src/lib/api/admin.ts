@@ -6,6 +6,24 @@ export type AdminUserStatus = 'active' | 'disabled';
 export type AdminUserRole = 'customer' | 'provider' | 'admin';
 export type PaymentStatus = 'pending' | 'success' | 'failed';
 
+export interface AdminCategoryRecord {
+  id: string;
+  name: string;
+  slug: string;
+  icon: string;
+  sortOrder: number;
+  isActive: boolean;
+  serviceCount: number;
+  createdAt: string;
+}
+
+export interface AdminCategoryPayload {
+  name: string;
+  icon: string;
+  sortOrder?: number;
+  isActive?: boolean;
+}
+
 export interface AdminProviderRecord {
   id: string;
   name: string;
@@ -115,6 +133,11 @@ const toQueryString = (query: AdminListQuery) => {
 
 export const adminApi = {
   getDashboard: () => apiClient.get<AdminDashboardData>('admin/dashboard'),
+  listCategories: () => apiClient.get<AdminCategoryRecord[]>('admin/categories'),
+  createCategory: (payload: AdminCategoryPayload) =>
+    apiClient.post<AdminCategoryRecord>('admin/categories', payload),
+  updateCategory: (categoryId: string, payload: Partial<AdminCategoryPayload>) =>
+    apiClient.patch<AdminCategoryRecord>(`admin/categories/${categoryId}`, payload),
   listProviders: (query: AdminListQuery = {}) =>
     apiClient.get<AdminProviderRecord[]>(`admin/providers${toQueryString(query)}`),
   updateProviderStatus: (providerId: string, status: AdminProviderStatus) =>
