@@ -1,12 +1,11 @@
 import React from 'react';
-import { createBrowserRouter } from 'react-router-dom';
+import { Navigate, createBrowserRouter } from 'react-router-dom';
 import { ProtectedRoute } from '../components/ProtectedRoute';
 import { RootRedirect } from '../components/RootRedirect';
 import { RoleLayout } from '../components/RoleLayout';
 import { BootPage } from '../pages/BootPage';
 import { LoginPage } from '../pages/LoginPage';
 import { OnboardingPage } from '../pages/OnboardingPage';
-import { SignupPage } from '../pages/SignupPage';
 import { RoleHomePage } from '../pages/RoleHomePage';
 import { CustomerExplorePage } from '../pages/customer/CustomerExplorePage';
 import { AdminDashboardPage } from '../pages/admin/AdminDashboardPage';
@@ -34,11 +33,11 @@ export const router = createBrowserRouter([
   },
   {
     path: '/signup',
-    element: <SignupPage />,
+    element: <Navigate to="/login" replace />,
   },
   {
     path: '/signup/:type',
-    element: <SignupPage />,
+    element: <Navigate to="/login" replace />,
   },
 
   // ── Customer Routes ──

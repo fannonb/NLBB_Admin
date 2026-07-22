@@ -21,7 +21,7 @@ export const RootRedirect = () => {
   }
 
   if (!user) {
-    return <Navigate to="/onboarding" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   return <Navigate to={routeByRole(user.role)} replace />;

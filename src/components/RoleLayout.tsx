@@ -10,46 +10,31 @@ interface RoleLayoutProps {
 interface NavItem {
   label: string;
   to: string;
+  token: string;
 }
 
 const roleLinks: Record<UserRole, NavItem[]> = {
   customer: [
-    { label: 'Home', to: '/customer/home' },
-    { label: 'Explore', to: '/customer/explore' },
-    { label: 'Book', to: '/customer/book' },
-    { label: 'Bookings', to: '/customer/bookings' },
-    { label: 'Profile', to: '/customer/profile' },
+    { label: 'Home', to: '/customer/home', token: 'HM' },
+    { label: 'Explore', to: '/customer/explore', token: 'EX' },
+    { label: 'Book', to: '/customer/book', token: 'BK' },
+    { label: 'Bookings', to: '/customer/bookings', token: 'MY' },
+    { label: 'Profile', to: '/customer/profile', token: 'ME' },
   ],
   provider: [
-    { label: 'Dashboard', to: '/provider/dashboard' },
-    { label: 'Appointments', to: '/provider/appointments' },
-    { label: 'Services', to: '/provider/services' },
-    { label: 'Reviews', to: '/provider/reviews' },
-    { label: 'Profile', to: '/provider/profile' },
+    { label: 'Dashboard', to: '/provider/dashboard', token: 'DB' },
+    { label: 'Appointments', to: '/provider/appointments', token: 'AP' },
+    { label: 'Services', to: '/provider/services', token: 'SV' },
+    { label: 'Reviews', to: '/provider/reviews', token: 'RV' },
+    { label: 'Profile', to: '/provider/profile', token: 'ME' },
   ],
   admin: [
-    { label: 'Overview', to: '/admin/dashboard' },
-    { label: 'Providers', to: '/admin/providers' },
-    { label: 'Categories', to: '/admin/categories' },
-    { label: 'Users', to: '/admin/users' },
-    { label: 'Revenue', to: '/admin/revenue' },
+    { label: 'Overview', to: '/admin/dashboard', token: 'OV' },
+    { label: 'Providers', to: '/admin/providers', token: 'PR' },
+    { label: 'Categories', to: '/admin/categories', token: 'CT' },
+    { label: 'Users', to: '/admin/users', token: 'US' },
+    { label: 'Revenue', to: '/admin/revenue', token: 'RV' },
   ],
-};
-
-const tabIcons: Record<string, string> = {
-  Home: '🏠',
-  Explore: '🔍',
-  Book: '➕',
-  Bookings: '📅',
-  Profile: '👤',
-  Dashboard: '📊',
-  Appointments: '📋',
-  Services: '💈',
-  Reviews: '⭐',
-  Users: '👥',
-  Providers: '🏪',
-  Revenue: '💰',
-  Subscription: '💳',
 };
 
 export const RoleLayout = ({ role }: RoleLayoutProps) => {
@@ -71,10 +56,10 @@ export const RoleLayout = ({ role }: RoleLayoutProps) => {
         <button
           type="button"
           className="menu-toggle"
-          onClick={() => setSidebarOpen(!sidebarOpen)}
+          onClick={() => setSidebarOpen((open) => !open)}
           aria-label="Toggle menu"
         >
-          ☰
+          Menu
         </button>
         <Link to="/" className="brand">
           NLBB
@@ -99,7 +84,9 @@ export const RoleLayout = ({ role }: RoleLayoutProps) => {
               className={({ isActive }) => (isActive ? 'side-link is-active' : 'side-link')}
               onClick={() => setSidebarOpen(false)}
             >
-              <span className="side-link-icon">{tabIcons[link.label] ?? '•'}</span>
+              <span className="side-link-icon" aria-hidden="true">
+                {link.token}
+              </span>
               {link.label}
             </NavLink>
           ))}
@@ -117,7 +104,9 @@ export const RoleLayout = ({ role }: RoleLayoutProps) => {
             to={link.to}
             className={({ isActive }) => (isActive ? 'tab-item is-active' : 'tab-item')}
           >
-            <span className="tab-icon">{tabIcons[link.label] ?? '•'}</span>
+            <span className="tab-icon" aria-hidden="true">
+              {link.token}
+            </span>
             <span className="tab-label">{link.label}</span>
           </NavLink>
         ))}

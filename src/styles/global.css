@@ -1,41 +1,43 @@
 :root {
-  --bg: #FAF9F6;
-  --bg-strong: #12100E;
+  --bg: #F3F4F6;
+  --bg-strong: #16202A;
   --panel: #FFFFFF;
-  --card-inner: #F5F1E8;
-  --ink: #1C1917;
-  --subtle: #57534E;
-  --muted: #A8A29E;
-  --accent: #B5922A;
-  --accent-light: #D4AF37;
-  --accent-deep: #9A7B22;
-  --accent-dim: rgba(181, 146, 42, 0.09);
-  --border: #E7E5E4;
-  --border-light: rgba(0, 0, 0, 0.06);
+  --card-inner: #EEF2F7;
+  --ink: #16202A;
+  --subtle: #475569;
+  --muted: #94A3B8;
+  --accent: #B48A2C;
+  --accent-light: #D8B55C;
+  --accent-deep: #7B5B22;
+  --accent-dim: rgba(180, 138, 44, 0.12);
+  --border: #D8E0E8;
+  --border-light: rgba(15, 23, 42, 0.08);
   --success: #16A34A;
   --error: #DC2626;
   --warning: #D97706;
-  --overlay: rgba(0, 0, 0, 0.35);
+  --overlay: rgba(15, 23, 42, 0.42);
+  --panel-translucent: rgba(255, 255, 255, 0.88);
 }
 
 [data-theme="dark"] {
-  --bg: #12100E;
-  --bg-strong: #FAF9F6;
-  --panel: #1B1815;
-  --card-inner: #24201C;
-  --ink: #F5EFE3;
-  --subtle: #CDC1AD;
-  --muted: #948A7C;
-  --accent: #D0AE4A;
-  --accent-light: #E2C56B;
-  --accent-deep: #C19A33;
-  --accent-dim: rgba(208, 174, 74, 0.16);
-  --border: #393128;
+  --bg: #0F1720;
+  --bg-strong: #F8FAFC;
+  --panel: #16202A;
+  --card-inner: #1E2937;
+  --ink: #F8FAFC;
+  --subtle: #CBD5E1;
+  --muted: #94A3B8;
+  --accent: #D0A443;
+  --accent-light: #E7C46D;
+  --accent-deep: #B88722;
+  --accent-dim: rgba(208, 164, 67, 0.16);
+  --border: #2A394A;
   --border-light: rgba(255, 255, 255, 0.08);
   --success: #4ADE80;
   --error: #F87171;
   --warning: #FBBF24;
-  --overlay: rgba(0, 0, 0, 0.62);
+  --overlay: rgba(2, 6, 23, 0.72);
+  --panel-translucent: rgba(22, 32, 42, 0.88);
 }
 
 * {
@@ -48,9 +50,10 @@ body {
   min-height: 100dvh;
   color: var(--ink);
   background: var(--bg);
-  font-family: "Satoshi", "Segoe UI", Tahoma, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Tahoma, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background 200ms ease, color 200ms ease;
 }
 
 a {
@@ -89,25 +92,26 @@ a {
 
 .hero-panel {
   max-width: 760px;
-  background: linear-gradient(135deg, #0f1f38 0%, #1f3f6f 100%);
+  background: linear-gradient(145deg, #16202A 0%, #25384C 58%, #8C6A29 100%);
   border-radius: 24px;
-  color: #f4f8ff;
+  color: #F8FAFC;
   padding: clamp(2rem, 3vw, 3rem);
-  box-shadow: 0 26px 50px rgba(12, 22, 42, 0.28);
+  box-shadow: 0 26px 50px rgba(15, 23, 42, 0.22);
 }
 
 .hero-panel h1 {
-  font-family: "Gambetta", "Georgia", serif;
+  font-family: "Playfair Display", Georgia, serif;
   font-size: clamp(2rem, 4vw, 3.2rem);
   margin: 0.5rem 0;
 }
 
 .eyebrow {
   margin: 0;
-  color: #ffd67f;
+  color: #E7C46D;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-size: 0.8rem;
+  font-weight: 700;
 }
 
 .hero-actions {
@@ -145,6 +149,178 @@ a {
 .auth-card p {
   margin: 0 0 0.5rem;
   color: var(--subtle);
+}
+
+/* ─── Auth Hero (Login / Signup) ─── */
+
+.auth-page--hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.4rem 1.4rem 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-hero-photo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 52vh;
+  background-size: cover;
+  background-position: center;
+  z-index: -2;
+}
+
+.auth-hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 52vh;
+  z-index: -1;
+  background: linear-gradient(to bottom, rgba(22, 32, 42, 0.28) 0%, rgba(22, 32, 42, 0.94) 100%);
+}
+
+.auth-hero-back {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #F8FAFC;
+  font-size: 0.88rem;
+  background: rgba(248, 250, 252, 0.12);
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  margin: 1rem 0 0;
+}
+
+.auth-hero-text {
+  text-align: center;
+  color: #F8FAFC;
+  margin: 1.4rem 0 1.6rem;
+  max-width: 480px;
+}
+
+.auth-hero-text h1 {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: clamp(1.9rem, 4vw, 2.5rem);
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+}
+
+.auth-hero-text p {
+  margin: 0;
+  font-size: 1.02rem;
+  color: rgba(248, 250, 252, 0.8);
+}
+
+.auth-card--dark {
+  width: min(100%, 440px);
+  background: rgba(22, 32, 42, 0.96);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  color: #F8FAFC;
+  box-shadow: 0 24px 48px rgba(15, 23, 42, 0.3);
+  margin-bottom: 1.6rem;
+}
+
+.auth-card--dark label {
+  color: #CBD5E1;
+}
+
+.auth-card--dark input {
+  background: rgba(15, 23, 42, 0.72);
+  border-color: rgba(148, 163, 184, 0.22);
+  color: #F8FAFC;
+}
+
+.auth-card--dark input:focus {
+  border-color: var(--accent-light);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.16);
+}
+
+.auth-card--dark h2 {
+  font-size: 1.15rem;
+  margin: 0 0 0.9rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+}
+
+.auth-card--dark .error-text {
+  color: #F87171;
+}
+
+.auth-forgot {
+  text-align: right;
+  margin-top: -0.2rem;
+}
+
+.auth-forgot a,
+.auth-card--dark .auth-links a {
+  color: var(--accent-light);
+  font-weight: 600;
+}
+
+.auth-fine-print {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #94A3B8;
+  margin: 0.4rem 0 0;
+  line-height: 1.5;
+}
+
+.auth-fine-print strong {
+  color: var(--accent-light);
+  font-weight: 600;
+}
+
+.auth-card--dark .auth-links {
+  justify-content: center;
+  margin-top: 0.4rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.22);
+  padding-top: 1.2rem;
+  gap: 0.6rem;
+}
+
+.auth-card--dark .auth-links span {
+  color: #948A7C;
+  font-size: 0.9rem;
+}
+
+.auth-role-cta {
+  text-align: center;
+  margin-top: 0.4rem;
+}
+
+.auth-role-cta a {
+  color: var(--accent-light);
+  font-size: 0.9rem;
+  background: rgba(212, 175, 55, 0.1);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  display: inline-block;
+  font-weight: 600;
+}
+
+.auth-footer-note {
+  text-align: center;
+  margin: 0 0 2rem;
+  max-width: 400px;
+  color: #F8FAFC;
+}
+
+.auth-footer-note h3 {
+  font-family: "Playfair Display", Georgia, serif;
+  margin: 0 0 0.5rem;
+  font-size: 1.2rem;
+}
+
+.auth-footer-note p {
+  margin: 0;
+  color: #CBD5E1;
+  font-size: 0.9rem;
+  line-height: 1.5;
 }
 
 /* ─── Forms ─── */
@@ -270,8 +446,8 @@ input:focus, select:focus, textarea:focus {
   justify-content: space-between;
   padding: 0.8rem 1.1rem;
   border-bottom: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(8px);
+  background: var(--panel-translucent);
+  backdrop-filter: blur(12px);
   position: sticky;
   top: 0;
   z-index: 20;
@@ -282,9 +458,9 @@ input:focus, select:focus, textarea:focus {
   text-decoration: none;
   font-weight: 800;
   letter-spacing: 0.03em;
-  font-size: 1.2rem;
-  font-family: "Satoshi-Bold", "Satoshi", sans-serif;
-  color: var(--accent);
+  font-size: 1.25rem;
+  font-family: "Playfair Display", Georgia, serif;
+  color: var(--accent-deep);
 }
 
 .topbar-actions {
@@ -296,7 +472,7 @@ input:focus, select:focus, textarea:focus {
 .user-chip {
   border-radius: 999px;
   border: 1px solid var(--border);
-  background: var(--panel);
+  background: var(--card-inner);
   padding: 0.4rem 0.7rem;
   font-size: 0.84rem;
   white-space: nowrap;
@@ -307,11 +483,14 @@ input:focus, select:focus, textarea:focus {
 
 .menu-toggle {
   display: none;
-  background: none;
-  border: none;
-  font-size: 1.4rem;
+  background: var(--card-inner);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
   cursor: pointer;
-  padding: 0.2rem 0.4rem;
+  padding: 0.45rem 0.7rem;
   color: var(--ink);
 }
 
@@ -337,7 +516,7 @@ input:focus, select:focus, textarea:focus {
 .sidebar {
   border-right: 1px solid var(--border);
   padding: 1rem;
-  background: var(--panel);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(238, 242, 247, 0.9));
   width: 240px;
   flex-shrink: 0;
   display: grid;
@@ -362,27 +541,39 @@ input:focus, select:focus, textarea:focus {
   font-size: 0.92rem;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.7rem;
+  border: 1px solid transparent;
 }
 
 .side-link-icon {
-  font-size: 1rem;
+  min-width: 2rem;
+  height: 2rem;
+  border-radius: 8px;
+  display: inline-grid;
+  place-items: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--accent-deep);
+  background: rgba(180, 138, 44, 0.08);
+  border: 1px solid rgba(180, 138, 44, 0.16);
 }
 
 .side-link.is-active {
-  background: rgba(181, 146, 42, 0.12);
+  background: rgba(180, 138, 44, 0.1);
   color: var(--accent-deep);
   font-weight: 700;
+  border-color: rgba(180, 138, 44, 0.2);
 }
 
 .side-link:hover:not(.is-active) {
-  background: var(--card-inner);
+  background: rgba(255, 255, 255, 0.78);
 }
 
 /* ─── Main Panel ─── */
 
 .main-panel {
-  padding: 1.25rem;
+  padding: 1.5rem;
   flex: 1;
   min-width: 0;
 }
@@ -394,7 +585,7 @@ input:focus, select:focus, textarea:focus {
 
 .page-stack h1 {
   margin: 0;
-  font-family: "Gambetta", "Georgia", serif;
+  font-family: "Playfair Display", Georgia, serif;
 }
 
 .subtle {
@@ -710,7 +901,7 @@ input:focus, select:focus, textarea:focus {
 
 .section-title {
   margin: 0;
-  font-family: "Gambetta", "Georgia", serif;
+  font-family: "Playfair Display", Georgia, serif;
   font-size: 1.15rem;
 }
 
@@ -783,7 +974,7 @@ input:focus, select:focus, textarea:focus {
 
 .modal-title {
   margin: 0;
-  font-family: "Gambetta", "Georgia", serif;
+  font-family: "Playfair Display", Georgia, serif;
   font-size: 1.15rem;
 }
 
@@ -875,7 +1066,7 @@ input:focus, select:focus, textarea:focus {
   bottom: 0;
   left: 0;
   right: 0;
-  background: var(--panel);
+  background: rgba(255, 255, 255, 0.94);
   border-top: 1px solid var(--border);
   padding: 0.45rem 0.5rem;
   padding-bottom: calc(0.45rem + env(safe-area-inset-bottom, 0px));
@@ -902,7 +1093,21 @@ input:focus, select:focus, textarea:focus {
 }
 
 .tab-icon {
-  font-size: 1.2rem;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  background: var(--card-inner);
+  border: 1px solid transparent;
+}
+
+.tab-item.is-active .tab-icon {
+  background: rgba(180, 138, 44, 0.12);
+  border-color: rgba(180, 138, 44, 0.18);
 }
 
 .tab-label {
@@ -1015,7 +1220,7 @@ input:focus, select:focus, textarea:focus {
 
 .map-banner h2 {
   margin: 0;
-  font-family: "Gambetta", "Georgia", serif;
+  font-family: "Playfair Display", Georgia, serif;
   font-size: 1.15rem;
   line-height: 1.4;
 }

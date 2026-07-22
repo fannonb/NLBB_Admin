@@ -24,17 +24,14 @@ export const OnboardingPage = () => {
   return (
     <div className="onboarding">
       <section className="hero-panel">
-        <p className="eyebrow">Nairobi Lifestyle Booking</p>
-        <h1>Everything beauty and wellness, in one place.</h1>
+        <p className="eyebrow">NLBB Admin</p>
+        <h1>Manage providers, bookings, and revenue from one console.</h1>
         <p>
-          Discover trusted providers, compare services, and manage bookings with a faster, installable web experience.
+          Sign in to review marketplace activity, verify providers, and track payment performance.
         </p>
         <div className="hero-actions">
-          <Link className="primary-btn" to="/signup">
-            Get Started
-          </Link>
-          <Link className="ghost-btn" to="/login">
-            Sign In
+          <Link className="primary-btn" to="/login">
+            Admin Login
           </Link>
         </div>
       </section>
