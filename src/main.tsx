@@ -9,6 +9,24 @@ declare global {
   }
 }
 
+const clearLegacyServiceWorkers = async () => {
+  if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
+    return;
+  }
+
+  try {
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    await Promise.allSettled(registrations.map((registration) => registration.unregister()));
+
+    if ('caches' in window) {
+      const cacheKeys = await caches.keys();
+      await Promise.allSettled(cacheKeys.map((key) => caches.delete(key)));
+    }
+  } catch (error) {
+    console.warn('[web] service worker cleanup failed', error);
+  }
+};
+
 const renderFatal = (title: string, detail: string) => {
   const root = document.getElementById('root');
   if (!root) {
@@ -23,17 +41,7 @@ const renderFatal = (title: string, detail: string) => {
   `;
 };
 
-if (
-  typeof window !== 'undefined' &&
-  'serviceWorker' in navigator &&
-  (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost')
-) {
-  navigator.serviceWorker.getRegistrations().then((registrations) => {
-    registrations.forEach((registration) => {
-      void registration.unregister();
-    });
-  });
-}
+void clearLegacyServiceWorkers();
 
 window.addEventListener('error', (event) => {
   renderFatal('Runtime Error', event.error?.message ?? String(event.message ?? 'Unknown error'));

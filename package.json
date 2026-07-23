@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite --configLoader runner --host 127.0.0.1 --clearScreen false",
     "dev:esbuild": "esbuild src/main.tsx --bundle --outdir=dev-dist/assets --entry-names=app --format=iife --platform=browser --target=es2017 --jsx=automatic --inject:src/react-shim.js --watch --servedir=dev-dist --serve=127.0.0.1:5180 --serve-fallback=dev-dist/index.html",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build --configLoader runner",
     "preview": "vite preview"
   },
   "dependencies": {
