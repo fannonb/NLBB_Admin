@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface ModalProps {
   visible: boolean;
@@ -43,7 +43,10 @@ export const Modal = ({ visible, onDismiss, title, children, variant = 'default'
 
   return (
     <div className="modal-overlay" ref={overlayRef} onClick={handleOverlayClick} role="dialog" aria-modal="true">
-      <div className={`modal-content modal-${variant}`}>
+      <div
+        className={`modal-content modal-${variant}`}
+        onClick={(event) => event.stopPropagation()}
+      >
         {title ? (
           <div className="modal-header">
             <h2 className="modal-title">{title}</h2>
@@ -65,31 +68,62 @@ export const ConfirmModal = ({
   title,
   message,
   confirmLabel = 'Confirm',
+  busyLabel,
   cancelLabel = 'Cancel',
   destructive = false,
 }: {
   visible: boolean;
   onDismiss: () => void;
-  onConfirm: () => void;
+  onConfirm: () => void | Promise<void>;
   title: string;
   message: string;
   confirmLabel?: string;
+  busyLabel?: string;
   cancelLabel?: string;
   destructive?: boolean;
 }) => {
+  const [confirming, setConfirming] = useState(false);
+
+  useEffect(() => {
+    if (!visible) {
+      setConfirming(false);
+    }
+  }, [visible]);
+
+  const handleConfirm = async () => {
+    if (confirming) {
+      return;
+    }
+
+    setConfirming(true);
+    try {
+      await Promise.resolve(onConfirm());
+    } finally {
+      setConfirming(false);
+    }
+  };
+
+  const dismiss = () => {
+    if (confirming) {
+      return;
+    }
+    onDismiss();
+  };
+
   return (
-    <Modal visible={visible} onDismiss={onDismiss} title={title}>
+    <Modal visible={visible} onDismiss={dismiss} title={title}>
       <p className="confirm-message">{message}</p>
       <div className="confirm-actions">
-        <button type="button" className="ghost-btn" onClick={onDismiss}>
+        <button type="button" className="ghost-btn" onClick={dismiss} disabled={confirming}>
           {cancelLabel}
         </button>
         <button
           type="button"
           className={`primary-btn ${destructive ? 'btn-destructive' : ''}`}
-          onClick={onConfirm}
+          onClick={() => void handleConfirm()}
+          disabled={confirming}
         >
-          {confirmLabel}
+          {confirming ? (busyLabel ?? `${confirmLabel}…`) : confirmLabel}
         </button>
       </div>
     </Modal>

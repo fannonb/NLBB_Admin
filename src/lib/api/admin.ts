@@ -82,7 +82,11 @@ export interface AdminDashboardData {
   }>;
   monthlyRevenue: Array<{
     month: string;
+    monthShort?: string;
+    year?: number;
+    monthIndex?: number;
     amount: number;
+    amountFormatted?: string;
   }>;
 }
 
@@ -105,7 +109,11 @@ export interface AdminRevenueReport {
   }>;
   monthlyRevenue: Array<{
     month: string;
+    monthShort?: string;
+    year?: number;
+    monthIndex?: number;
     amount: number;
+    amountFormatted?: string;
   }>;
   payments: Array<{
     id: string;
@@ -114,7 +122,13 @@ export interface AdminRevenueReport {
     amount: string;
     amountRaw: number;
     date: string;
+    createdAt?: string;
+    year?: number;
+    monthIndex?: number;
     status: PaymentStatus;
+    phoneNumber?: string | null;
+    mpesaReceiptNumber?: string | null;
+    method?: string;
   }>;
 }
 
@@ -138,6 +152,8 @@ export const adminApi = {
     apiClient.post<AdminCategoryRecord>('admin/categories', payload),
   updateCategory: (categoryId: string, payload: Partial<AdminCategoryPayload>) =>
     apiClient.patch<AdminCategoryRecord>(`admin/categories/${categoryId}`, payload),
+  deleteCategory: (categoryId: string) =>
+    apiClient.delete<{ id: string; deleted: boolean }>(`admin/categories/${categoryId}`),
   listProviders: (query: AdminListQuery = {}) =>
     apiClient.get<AdminProviderRecord[]>(`admin/providers${toQueryString(query)}`),
   updateProviderStatus: (providerId: string, status: AdminProviderStatus) =>

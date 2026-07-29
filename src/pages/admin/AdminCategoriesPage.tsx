@@ -8,6 +8,7 @@ import {
   DEFAULT_CATEGORY_ICON,
   categoryIconGlyph,
 } from '../../constants/categoryIcons';
+import { ApiClientError } from '../../lib/api/client';
 import { adminApi, AdminCategoryRecord } from '../../lib/api/admin';
 import {
   AdminError,
@@ -30,6 +31,7 @@ export const AdminCategoriesPage = () => {
   const [form, setForm] = useState<CategoryFormState>(EMPTY_FORM);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [pendingStatus, setPendingStatus] = useState<AdminCategoryRecord | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<AdminCategoryRecord | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -101,6 +103,33 @@ export const AdminCategoriesPage = () => {
       showToast(toErrorMessage(err, 'Could not update category status.'), 'error');
     } finally {
       setPendingStatus(null);
+    }
+  };
+
+  const confirmDelete = async () => {
+    const target = pendingDelete;
+    if (!target) return;
+
+    const removeFromList = () => {
+      setCategories((current) => current.filter((item) => item.id !== target.id));
+      if (editingId === target.id) {
+        resetForm();
+      }
+    };
+
+    try {
+      await adminApi.deleteCategory(target.id);
+      removeFromList();
+      showToast('Category permanently deleted.', 'success');
+    } catch (err) {
+      if (err instanceof Error && (err as ApiClientError).name === 'ApiClientError' && (err as ApiClientError).status === 404) {
+        removeFromList();
+        showToast('Category was already removed.', 'success');
+      } else {
+        showToast(toErrorMessage(err, 'Could not delete category.'), 'error');
+      }
+    } finally {
+      setPendingDelete(null);
     }
   };
 
@@ -185,6 +214,17 @@ export const AdminCategoriesPage = () => {
                   <div className="admin-row-actions">
                     <button type="button" className="outline-btn" onClick={() => startEditing(category)}>Edit</button>
                     <button type="button" className="ghost-btn" onClick={() => setPendingStatus(category)}>{category.isActive ? 'Deactivate' : 'Activate'}</button>
+                    {!category.isActive ? (
+                      <button
+                        type="button"
+                        className="ghost-btn danger-link"
+                        disabled={category.serviceCount > 0}
+                        title={category.serviceCount > 0 ? 'Reassign or remove linked services before deleting.' : undefined}
+                        onClick={() => setPendingDelete(category)}
+                      >
+                        Delete
+                      </button>
+                    ) : null}
                   </div>
                 </article>
               ))}
@@ -203,6 +243,17 @@ export const AdminCategoriesPage = () => {
         destructive={pendingStatus?.isActive}
         onDismiss={() => setPendingStatus(null)}
         onConfirm={toggleStatus}
+      />
+
+      <ConfirmModal
+        visible={!!pendingDelete}
+        title="Delete Category"
+        message={`Permanently delete ${pendingDelete?.name}? This cannot be undone.`}
+        confirmLabel="Delete forever"
+        busyLabel="Deleting..."
+        destructive
+        onDismiss={() => setPendingDelete(null)}
+        onConfirm={confirmDelete}
       />
     </section>
   );

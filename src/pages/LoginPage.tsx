@@ -38,61 +38,65 @@ export const LoginPage = () => {
   };
 
   return (
-    <div className="auth-page auth-page--hero">
-      <div
-        className="auth-hero-photo"
-        style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=1200&auto=format&fit=crop")' }}
-      />
-      <div className="auth-hero-overlay" />
+    <div className="auth-page auth-page--admin">
+      <div className="auth-admin-backdrop" aria-hidden="true" />
 
-      <div className="auth-hero-text">
-        <h1>NLBB Admin</h1>
-        <p>Sign in to manage operations, providers, bookings, and payments.</p>
-      </div>
+      <div className="auth-admin-shell">
+        <header className="auth-admin-header">
+          <p className="auth-admin-brand">NLBB</p>
+          <p className="auth-admin-lead">
+            Manage providers, bookings, categories, and payments from one console.
+          </p>
+        </header>
 
-      <form className="auth-card auth-card--dark" onSubmit={onSubmit}>
-        <label htmlFor="email">Email</label>
-        <input
-          id="email"
-          type="email"
-          autoComplete="email"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          required
-        />
+        <form className="auth-admin-card" onSubmit={onSubmit}>
+          <div className="auth-admin-field">
+            <label htmlFor="email">Email</label>
+            <input
+              id="email"
+              type="email"
+              autoComplete="email"
+              placeholder="admin@nlbb.ke"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              required
+            />
+          </div>
 
-        <label htmlFor="password">Password</label>
-        <input
-          id="password"
-          type="password"
-          autoComplete="current-password"
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-          required
-        />
+          <div className="auth-admin-field">
+            <label htmlFor="password">Password</label>
+            <input
+              id="password"
+              type="password"
+              autoComplete="current-password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              required
+            />
+          </div>
 
-        <div className="auth-forgot">
-          <a href="#">Forgot password?</a>
-        </div>
+          <div className="auth-admin-actions">
+            <button type="submit" className="primary-btn auth-admin-submit" disabled={isSubmitting}>
+              {isSubmitting ? 'Signing in…' : 'Sign in'}
+            </button>
+          </div>
 
-        {error ? <p className="error-text">{error}</p> : null}
+          {error ? <p className="error-text auth-admin-error">{error}</p> : null}
 
-        <button type="submit" className="primary-btn" disabled={isSubmitting} style={{ marginTop: '0.5rem' }}>
-          {isSubmitting ? 'Signing in...' : 'Sign In'}
-        </button>
+          <div className="auth-admin-notice" role="note">
+            <p className="auth-admin-notice-title">Operational access only</p>
+            <p className="auth-admin-notice-copy">
+              Admin accounts are provisioned by NLBB. Use the credentials assigned to your team
+              member account.
+            </p>
+          </div>
 
-        <p className="auth-fine-print">
-          By continuing, you agree to NLBB's <br />
-          <strong>Terms of Service</strong> and <strong>Privacy Policy</strong>.
-        </p>
-
-      </form>
-
-      <div className="auth-footer-note">
-        <h3>Operational access only.</h3>
-        <p>
-          Admin accounts are managed outside this web app. Use your assigned credentials to continue.
-        </p>
+          <p className="auth-admin-fine-print">
+            By continuing, you agree to NLBB&apos;s{' '}
+            <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
+          </p>
+        </form>
       </div>
     </div>
   );

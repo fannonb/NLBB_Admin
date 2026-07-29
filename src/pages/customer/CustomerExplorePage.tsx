@@ -1,9 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { providerApi } from '../../lib/api/providers';
+import { useAppStore } from '../../stores/appStore';
+import { SearchBar } from '../../components/SearchBar';
+import { CategoryPill } from '../../components/CategoryPill';
+import { ProviderCard } from '../../components/ProviderCard';
+import { EmptyState } from '../../components/EmptyState';
 import type { Category, Provider } from '../../types';
 
 export const CustomerExplorePage = () => {
+  const navigate = useNavigate();
+  const favorites = useAppStore((state) => state.favorites);
+  const toggleFavorite = useAppStore((state) => state.toggleFavorite);
+
   const [categories, setCategories] = useState<Category[]>([]);
   const [providers, setProviders] = useState<Provider[]>([]);
   const [search, setSearch] = useState('');
@@ -52,48 +61,47 @@ export const CustomerExplorePage = () => {
       <h1>Explore Providers</h1>
       <p className="subtle">Browse by category and book verified providers around Nairobi.</p>
 
-      <div className="filter-bar">
-        <input
-          type="search"
-          placeholder="Search salons, barbers, spas..."
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
+      <SearchBar value={search} onChangeText={setSearch} placeholder="Search salons, barbers, spas..." />
+
+      <div className="h-scroll">
+        <CategoryPill
+          category={{ id: '', name: 'All', icon: '✦' }}
+          isActive={selectedCategory === ''}
+          onPress={() => setSelectedCategory('')}
         />
-        <select value={selectedCategory} onChange={(event) => setSelectedCategory(event.target.value)}>
-          <option value="">All categories</option>
-          {categories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.name}
-            </option>
-          ))}
-        </select>
+        {categories.map((category) => (
+          <CategoryPill
+            key={category.id}
+            category={category}
+            isActive={selectedCategory === category.id}
+            onPress={() => setSelectedCategory(category.id)}
+          />
+        ))}
       </div>
 
       {isLoading ? <p className="subtle">Loading providers...</p> : null}
       {error ? <p className="error-text">{error}</p> : null}
 
-      <div className="provider-grid">
-        {providers.map((provider) => (
-          <article key={provider.id} className="provider-card">
-            <div className="provider-meta">
-              <h2>{provider.name}</h2>
-              <span className={provider.isOpen ? 'open-pill' : 'closed-pill'}>
-                {provider.isOpen ? 'Open now' : 'Closed'}
-              </span>
-            </div>
-            <p>{provider.description}</p>
-            <p className="subtle">
-              {provider.location} • From KES {provider.priceFrom}
-            </p>
-            <p className="subtle">
-              Rating {provider.rating.toFixed(1)} ({provider.reviewCount} reviews)
-            </p>
-            <Link className="primary-btn provider-link" to={`/customer/provider/${provider.id}`}>
-              View Provider
-            </Link>
-          </article>
-        ))}
-      </div>
+      {!isLoading && !error && providers.length === 0 ? (
+        <EmptyState
+          icon="🔍"
+          title="No providers found"
+          subtitle="Try a different search term or category."
+        />
+      ) : (
+        <div className="provider-grid">
+          {providers.map((provider) => (
+            <ProviderCard
+              key={provider.id}
+              provider={provider}
+              isFavorited={favorites.includes(provider.id)}
+              onPress={() => navigate(`/customer/provider/${provider.id}`)}
+              onBookPress={() => navigate(`/customer/provider/${provider.id}/book`)}
+              onFavoritePress={() => void toggleFavorite(provider.id)}
+            />
+          ))}
+        </div>
+      )}
     </section>
   );
 };

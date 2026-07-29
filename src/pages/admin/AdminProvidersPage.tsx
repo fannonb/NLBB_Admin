@@ -72,7 +72,7 @@ export const AdminProvidersPage = () => {
       if (pendingAction.delete) {
         await adminApi.deleteProvider(provider.id);
         setProviders((current) => current.filter((item) => item.id !== provider.id));
-        showToast('Provider deleted.', 'success');
+        showToast('Provider permanently deleted.', 'success');
       } else if (status) {
         const updated = await adminApi.updateProviderStatus(provider.id, status);
         setProviders((current) => current.map((item) => (item.id === provider.id ? { ...item, ...updated, status } : item)));
@@ -90,7 +90,7 @@ export const AdminProvidersPage = () => {
   if (error && providers.length === 0) return <AdminError message={error} onRetry={loadProviders} />;
 
   const actionLabel = pendingAction?.delete
-    ? 'Delete'
+    ? 'Delete forever'
     : pendingAction?.status === 'approved'
       ? 'Approve'
       : pendingAction?.status === 'suspended'
@@ -101,7 +101,7 @@ export const AdminProvidersPage = () => {
     <section className="page-stack admin-page">
       <AdminPageHeader
         title="Providers"
-        subtitle="Review applications, manage provider visibility, and keep provider accounts in good standing."
+        subtitle="Review applications, suspend visibility, or permanently delete a provider account."
         action={<button type="button" className="outline-btn" onClick={loadProviders}>Refresh</button>}
       />
 
@@ -177,7 +177,7 @@ export const AdminProvidersPage = () => {
         title={`${actionLabel} Provider`}
         message={
           pendingAction?.delete
-            ? `Delete ${pendingAction.provider.name}? This will disable the linked owner account.`
+            ? `Permanently delete ${pendingAction.provider.name}? This wipes the provider listing and the linked owner account. This cannot be undone.`
             : `${actionLabel} ${pendingAction?.provider.name}?`
         }
         confirmLabel={actionLabel}

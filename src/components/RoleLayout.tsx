@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import type { UserRole } from '../types';
+import { NavIconKey, NavIcons } from './NavIcons';
 
 interface RoleLayoutProps {
   role: UserRole;
@@ -10,30 +11,30 @@ interface RoleLayoutProps {
 interface NavItem {
   label: string;
   to: string;
-  token: string;
+  icon: NavIconKey;
 }
 
 const roleLinks: Record<UserRole, NavItem[]> = {
   customer: [
-    { label: 'Home', to: '/customer/home', token: 'HM' },
-    { label: 'Explore', to: '/customer/explore', token: 'EX' },
-    { label: 'Book', to: '/customer/book', token: 'BK' },
-    { label: 'Bookings', to: '/customer/bookings', token: 'MY' },
-    { label: 'Profile', to: '/customer/profile', token: 'ME' },
+    { label: 'Home', to: '/customer/home', icon: 'home' },
+    { label: 'Explore', to: '/customer/explore', icon: 'explore' },
+    { label: 'Book', to: '/customer/book', icon: 'book' },
+    { label: 'Bookings', to: '/customer/bookings', icon: 'bookings' },
+    { label: 'Profile', to: '/customer/profile', icon: 'profile' },
   ],
   provider: [
-    { label: 'Dashboard', to: '/provider/dashboard', token: 'DB' },
-    { label: 'Appointments', to: '/provider/appointments', token: 'AP' },
-    { label: 'Services', to: '/provider/services', token: 'SV' },
-    { label: 'Reviews', to: '/provider/reviews', token: 'RV' },
-    { label: 'Profile', to: '/provider/profile', token: 'ME' },
+    { label: 'Dashboard', to: '/provider/dashboard', icon: 'dashboard' },
+    { label: 'Appointments', to: '/provider/appointments', icon: 'appointments' },
+    { label: 'Services', to: '/provider/services', icon: 'services' },
+    { label: 'Reviews', to: '/provider/reviews', icon: 'reviews' },
+    { label: 'Profile', to: '/provider/profile', icon: 'profile' },
   ],
   admin: [
-    { label: 'Overview', to: '/admin/dashboard', token: 'OV' },
-    { label: 'Providers', to: '/admin/providers', token: 'PR' },
-    { label: 'Categories', to: '/admin/categories', token: 'CT' },
-    { label: 'Users', to: '/admin/users', token: 'US' },
-    { label: 'Revenue', to: '/admin/revenue', token: 'RV' },
+    { label: 'Overview', to: '/admin/dashboard', icon: 'overview' },
+    { label: 'Providers', to: '/admin/providers', icon: 'providers' },
+    { label: 'Categories', to: '/admin/categories', icon: 'categories' },
+    { label: 'Users', to: '/admin/users', icon: 'users' },
+    { label: 'Revenue', to: '/admin/revenue', icon: 'revenue' },
   ],
 };
 
@@ -77,19 +78,22 @@ export const RoleLayout = ({ role }: RoleLayoutProps) => {
       <div className="content-grid">
         <aside className={`sidebar ${sidebarOpen ? 'is-open' : ''}`}>
           <p className="sidebar-title">{role.toUpperCase()}</p>
-          {links.map((link) => (
-            <NavLink
-              key={link.to}
-              to={link.to}
-              className={({ isActive }) => (isActive ? 'side-link is-active' : 'side-link')}
-              onClick={() => setSidebarOpen(false)}
-            >
-              <span className="side-link-icon" aria-hidden="true">
-                {link.token}
-              </span>
-              {link.label}
-            </NavLink>
-          ))}
+          {links.map((link) => {
+            const Icon = NavIcons[link.icon];
+            return (
+              <NavLink
+                key={link.to}
+                to={link.to}
+                className={({ isActive }) => (isActive ? 'side-link is-active' : 'side-link')}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span className="side-link-icon" aria-hidden="true">
+                  <Icon />
+                </span>
+                {link.label}
+              </NavLink>
+            );
+          })}
         </aside>
 
         <main className="main-panel">
@@ -98,18 +102,21 @@ export const RoleLayout = ({ role }: RoleLayoutProps) => {
       </div>
 
       <nav className="bottom-tab-bar">
-        {links.map((link) => (
-          <NavLink
-            key={link.to}
-            to={link.to}
-            className={({ isActive }) => (isActive ? 'tab-item is-active' : 'tab-item')}
-          >
-            <span className="tab-icon" aria-hidden="true">
-              {link.token}
-            </span>
-            <span className="tab-label">{link.label}</span>
-          </NavLink>
-        ))}
+        {links.map((link) => {
+          const Icon = NavIcons[link.icon];
+          return (
+            <NavLink
+              key={link.to}
+              to={link.to}
+              className={({ isActive }) => (isActive ? 'tab-item is-active' : 'tab-item')}
+            >
+              <span className="tab-icon" aria-hidden="true">
+                <Icon />
+              </span>
+              <span className="tab-label">{link.label}</span>
+            </NavLink>
+          );
+        })}
       </nav>
     </div>
   );

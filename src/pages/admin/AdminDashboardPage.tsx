@@ -70,11 +70,11 @@ export const AdminDashboardPage = () => {
           </div>
           <div className="admin-chart">
             {data.monthlyRevenue.map((item) => (
-              <div className="admin-chart-item" key={item.month}>
+              <div className="admin-chart-item" key={`${item.year ?? 'y'}-${item.month}`}>
                 <div className="admin-chart-track">
                   <span style={{ height: `${Math.max(8, (item.amount / maxRevenue) * 100)}%` }} />
                 </div>
-                <small>{item.month}</small>
+                <small>{item.monthShort ?? item.month}</small>
               </div>
             ))}
           </div>

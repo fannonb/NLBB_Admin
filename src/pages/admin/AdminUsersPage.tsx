@@ -71,8 +71,8 @@ export const AdminUsersPage = () => {
     try {
       if (pendingAction.delete) {
         await adminApi.deleteUser(user.id);
-        setUsers((current) => current.map((item) => (item.id === user.id ? { ...item, status: 'disabled' } : item)));
-        showToast('User disabled.', 'success');
+        setUsers((current) => current.filter((item) => item.id !== user.id));
+        showToast('User permanently deleted.', 'success');
       } else if (status) {
         const updated = await adminApi.updateUserStatus(user.id, status);
         setUsers((current) => current.map((item) => (item.id === user.id ? { ...item, ...updated, status } : item)));
@@ -90,7 +90,7 @@ export const AdminUsersPage = () => {
   if (error && users.length === 0) return <AdminError message={error} onRetry={loadUsers} />;
 
   const actionLabel = pendingAction?.delete
-    ? 'Delete'
+    ? 'Delete forever'
     : pendingAction?.status === 'active'
       ? 'Enable'
       : 'Disable';
@@ -99,7 +99,7 @@ export const AdminUsersPage = () => {
     <section className="page-stack admin-page">
       <AdminPageHeader
         title="Users"
-        subtitle="Search accounts, review activity counts, and disable or restore access when needed."
+        subtitle="Search accounts, disable access temporarily, or permanently delete an account."
         action={<button type="button" className="outline-btn" onClick={loadUsers}>Refresh</button>}
       />
 
@@ -178,7 +178,7 @@ export const AdminUsersPage = () => {
         title={`${actionLabel} User`}
         message={
           pendingAction?.delete
-            ? `Delete ${pendingAction.user.name}? This will currently disable the account.`
+            ? `Permanently delete ${pendingAction.user.name}? This wipes the account and related data. This cannot be undone.`
             : `${actionLabel} ${pendingAction?.user.name}?`
         }
         confirmLabel={actionLabel}
