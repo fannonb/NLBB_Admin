@@ -1,7 +1,7 @@
 import { apiClient } from './client';
 
 export type AdminProviderStatus = 'pending' | 'approved' | 'suspended';
-export type AdminProviderSubscriptionStatus = 'active' | 'expired' | 'paused' | 'none';
+export type AdminProviderSubscriptionStatus = 'active' | 'expired' | 'paused' | 'complimentary' | 'none';
 export type AdminUserStatus = 'active' | 'disabled';
 export type AdminUserRole = 'customer' | 'provider' | 'admin';
 export type PaymentStatus = 'pending' | 'success' | 'failed';

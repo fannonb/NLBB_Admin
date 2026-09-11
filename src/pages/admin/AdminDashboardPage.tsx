@@ -62,9 +62,9 @@ export const AdminDashboardPage = () => {
 
       {settings?.subscriptionsPaused ? (
         <div className="admin-callout is-paused">
-          <h2>All subscriptions are paused</h2>
+          <h2>Subscription payments are paused</h2>
           <p>
-            Providers stay hidden from new bookings until you reinstate them. Remaining paid days are frozen.{' '}
+            Every provider has complimentary premium access. Paid remaining days are frozen.{' '}
             <Link to="/admin/settings">Manage in Settings</Link>
           </p>
         </div>

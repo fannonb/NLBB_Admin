@@ -78,11 +78,11 @@ export const AdminProvidersPage = () => {
       } else if (pendingAction.pauseSubscription) {
         await adminApi.pauseProviderSubscription(provider.id);
         await loadProviders();
-        showToast('Subscription paused. Remaining days are frozen.', 'success');
+        showToast('Payments paused. This provider has complimentary premium access.', 'success');
       } else if (pendingAction.resumeSubscription) {
         await adminApi.resumeProviderSubscription(provider.id);
         await loadProviders();
-        showToast('Subscription reinstated with remaining days restored.', 'success');
+        showToast('Payments required again. Remaining paid days are restored.', 'success');
       } else if (status) {
         const updated = await adminApi.updateProviderStatus(provider.id, status);
         setProviders((current) => current.map((item) => (item.id === provider.id ? { ...item, ...updated, status } : item)));
@@ -102,9 +102,9 @@ export const AdminProvidersPage = () => {
   const actionLabel = pendingAction?.delete
     ? 'Delete forever'
     : pendingAction?.pauseSubscription
-      ? 'Pause subscription'
+      ? 'Grant free access'
       : pendingAction?.resumeSubscription
-        ? 'Reinstate subscription'
+        ? 'Require payment'
         : pendingAction?.status === 'approved'
           ? 'Approve'
           : pendingAction?.status === 'suspended'
@@ -115,7 +115,7 @@ export const AdminProvidersPage = () => {
     <section className="page-stack admin-page">
       <AdminPageHeader
         title="Providers"
-        subtitle="Review applications, pause subscriptions without burning remaining days, or suspend a listing."
+        subtitle="Review applications, grant complimentary premium access without charging, or suspend a listing."
         action={<button type="button" className="outline-btn" onClick={loadProviders}>Refresh</button>}
       />
 
@@ -161,7 +161,7 @@ export const AdminProvidersPage = () => {
                   <td><StatusBadge status={provider.status} /></td>
                   <td>
                     <StatusBadge status={provider.subscriptionStatus} />
-                    {provider.subscriptionStatus === 'paused' && (provider.remainingDays ?? 0) > 0 ? (
+                    {provider.subscriptionStatus === 'complimentary' && (provider.remainingDays ?? 0) > 0 ? (
                       <span className="admin-sub-meta">{provider.remainingDays} day{provider.remainingDays === 1 ? '' : 's'} remaining</span>
                     ) : null}
                   </td>
@@ -181,11 +181,11 @@ export const AdminProvidersPage = () => {
                       ) : null}
                       {provider.subscriptionPauseScope === 'account' || provider.subscriptionPauseScope === 'both' ? (
                         <button type="button" className="outline-btn" disabled={actioningId === provider.id} onClick={() => setPendingAction({ provider, resumeSubscription: true })}>
-                          Resume plan
+                          Require payment
                         </button>
                       ) : (
                         <button type="button" className="ghost-btn" disabled={actioningId === provider.id} onClick={() => setPendingAction({ provider, pauseSubscription: true })}>
-                          Pause plan
+                          Grant free access
                         </button>
                       )}
                       <button type="button" className="ghost-btn danger-link" disabled={actioningId === provider.id} onClick={() => setPendingAction({ provider, delete: true })}>
@@ -207,13 +207,13 @@ export const AdminProvidersPage = () => {
           pendingAction?.delete
             ? `Permanently delete ${pendingAction.provider.name}? This wipes the provider listing and the linked owner account. This cannot be undone.`
             : pendingAction?.pauseSubscription
-              ? `Pause the subscription for ${pendingAction.provider.name}? Remaining paid days stay frozen until you resume this account.`
+              ? `Pause payments for ${pendingAction.provider.name}? They keep premium access without paying. Remaining paid days stay frozen until you require payment again.`
               : pendingAction?.resumeSubscription
-                ? `Reinstate the subscription for ${pendingAction.provider.name}? Remaining paid days start counting again from now.`
+                ? `Require payment again for ${pendingAction.provider.name}? Remaining paid days start counting from now. If none remain, premium access ends.`
                 : `${actionLabel} ${pendingAction?.provider.name}?`
         }
         confirmLabel={actionLabel}
-        destructive={pendingAction?.delete || pendingAction?.status === 'suspended' || pendingAction?.pauseSubscription}
+        destructive={pendingAction?.delete || pendingAction?.status === 'suspended' || pendingAction?.resumeSubscription}
         onDismiss={() => setPendingAction(null)}
         onConfirm={runAction}
       />

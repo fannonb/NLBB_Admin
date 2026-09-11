@@ -43,7 +43,12 @@ export const AdminSettingsPage = () => {
       const data = await adminApi.setSubscriptionsPaused(pendingPause, reason);
       setSettings(data);
       setReason(data.pauseReason ?? '');
-      showToast(pendingPause ? 'All subscriptions paused. Remaining days are frozen.' : 'Subscriptions reinstated with remaining days restored.', 'success');
+      showToast(
+        pendingPause
+          ? 'Subscription payments paused. Every provider now has complimentary premium access.'
+          : 'Payments are required again. Remaining paid days have been restored.',
+        'success'
+      );
     } catch (err) {
       showToast(toErrorMessage(err, 'Could not update subscriptions.'), 'error');
     } finally {
@@ -59,26 +64,26 @@ export const AdminSettingsPage = () => {
   return (
     <section className="page-stack admin-page">
       <AdminPageHeader
-        title="Subscription controls"
-        subtitle="Pause every provider subscription at once, or reinstate them with the remaining paid days restored."
+        title="Subscription payments"
+        subtitle="Pause charging without cutting access. Every new and existing provider stays on premium until you require payment again."
         action={<button type="button" className="outline-btn" onClick={loadSettings}>Refresh</button>}
       />
 
       {error ? <p className="error-text">{error}</p> : null}
 
       <div className={`admin-callout ${settings.subscriptionsPaused ? 'is-paused' : ''}`}>
-        <h2>{settings.subscriptionsPaused ? 'Subscriptions are paused for all providers' : 'Subscriptions are running'}</h2>
+        <h2>{settings.subscriptionsPaused ? 'Payments are paused — all providers have complimentary access' : 'Payments are required'}</h2>
         <p>
           {settings.subscriptionsPaused
-            ? `Paid time is frozen. ${settings.frozenPaidCount} provider${settings.frozenPaidCount === 1 ? '' : 's'} still have remaining days that will resume on reinstatement.${settings.pausedAt ? ` Paused ${formatDateTime(settings.pausedAt)}.` : ''}`
-            : 'Providers with an active plan stay visible and can accept bookings. Individual account pauses still apply from the Providers page.'}
+            ? `Listings stay live and bookings stay open. Paid time is frozen. ${settings.frozenPaidCount} provider${settings.frozenPaidCount === 1 ? '' : 's'} still have remaining days that resume when you switch payments back on.${settings.pausedAt ? ` Paused ${formatDateTime(settings.pausedAt)}.` : ''}`
+            : 'Providers need an active paid plan to stay visible and accept bookings. You can still grant complimentary access to one account from the Providers page.'}
         </p>
       </div>
 
       <article className="admin-panel">
         <div className="admin-panel-header">
           <h2>All accounts</h2>
-          <span>{settings.pausedAccountCount} individually paused</span>
+          <span>{settings.pausedAccountCount} individually complimentary</span>
         </div>
         <div className="admin-settings-form">
           <label>
@@ -87,16 +92,16 @@ export const AdminSettingsPage = () => {
               rows={3}
               value={reason}
               onChange={(event) => setReason(event.target.value)}
-              placeholder="Shown in admin logs, for example maintenance or billing review"
+              placeholder="Shown in admin logs, for example launch promo or billing hold"
             />
           </label>
           {settings.subscriptionsPaused ? (
             <button type="button" className="outline-btn" disabled={saving} onClick={() => setPendingPause(false)}>
-              Reinstate all subscriptions
+              Require payments again
             </button>
           ) : (
             <button type="button" className="ghost-btn" disabled={saving} onClick={() => setPendingPause(true)}>
-              Pause all subscriptions
+              Pause all subscription payments
             </button>
           )}
         </div>
@@ -104,14 +109,14 @@ export const AdminSettingsPage = () => {
 
       <ConfirmModal
         visible={pendingPause !== null}
-        title={pendingPause ? 'Pause all subscriptions?' : 'Reinstate all subscriptions?'}
+        title={pendingPause ? 'Pause subscription payments?' : 'Require payments again?'}
         message={
           pendingPause
-            ? 'Providers will be hidden from customer booking until you reinstate. Remaining paid days are frozen and restored when this is turned off.'
-            : 'Providers with remaining paid days become active again from this moment. Individually paused accounts stay paused until you resume them on the Providers page.'
+            ? 'Every provider — new and existing — gets complimentary premium access. Paid remaining days freeze and do not burn while this is on.'
+            : 'Providers with remaining paid days stay active from this moment. Anyone without remaining days loses premium access. Accounts you granted free access to individually stay complimentary until you require payment on the Providers page.'
         }
-        confirmLabel={pendingPause ? 'Pause all' : 'Reinstate'}
-        destructive={pendingPause === true}
+        confirmLabel={pendingPause ? 'Pause payments' : 'Require payments'}
+        destructive={pendingPause === false}
         onDismiss={() => setPendingPause(null)}
         onConfirm={runToggle}
       />
