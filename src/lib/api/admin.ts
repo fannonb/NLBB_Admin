@@ -1,7 +1,7 @@
 import { apiClient } from './client';
 
 export type AdminProviderStatus = 'pending' | 'approved' | 'suspended';
-export type AdminProviderSubscriptionStatus = 'active' | 'expired' | 'none';
+export type AdminProviderSubscriptionStatus = 'active' | 'expired' | 'paused' | 'none';
 export type AdminUserStatus = 'active' | 'disabled';
 export type AdminUserRole = 'customer' | 'provider' | 'admin';
 export type PaymentStatus = 'pending' | 'success' | 'failed';
@@ -34,6 +34,10 @@ export interface AdminProviderRecord {
   email: string;
   status: AdminProviderStatus;
   subscriptionStatus: AdminProviderSubscriptionStatus;
+  subscriptionPaused?: boolean;
+  subscriptionPauseScope?: 'account' | 'global' | 'both' | null;
+  remainingDays?: number;
+  remainingMs?: number;
   subscriptionPlan?: string;
   bookingsCount: number;
   rating: number;
@@ -132,6 +136,16 @@ export interface AdminRevenueReport {
   }>;
 }
 
+export interface AdminSubscriptionSettings {
+  subscriptionsPaused: boolean;
+  pausedAt: string | null;
+  pauseReason: string | null;
+  pausedBy: string | null;
+  updatedAt: string;
+  pausedAccountCount: number;
+  frozenPaidCount: number;
+}
+
 interface AdminListQuery {
   status?: string;
   q?: string;
@@ -166,4 +180,11 @@ export const adminApi = {
     apiClient.patch<AdminUserRecord>(`admin/users/${userId}/status`, { status }),
   deleteUser: (userId: string) => apiClient.delete<{ id: string; deleted: boolean }>(`admin/users/${userId}`),
   getRevenue: () => apiClient.get<AdminRevenueReport>('admin/revenue'),
+  getSettings: () => apiClient.get<AdminSubscriptionSettings>('admin/settings'),
+  setSubscriptionsPaused: (paused: boolean, reason?: string) =>
+    apiClient.patch<AdminSubscriptionSettings>('admin/settings/subscriptions', { paused, reason }),
+  pauseProviderSubscription: (providerId: string, reason?: string) =>
+    apiClient.post<AdminProviderRecord>(`admin/providers/${providerId}/subscription/pause`, { reason }),
+  resumeProviderSubscription: (providerId: string) =>
+    apiClient.post<AdminProviderRecord>(`admin/providers/${providerId}/subscription/resume`),
 };

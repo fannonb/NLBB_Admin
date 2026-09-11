@@ -18,7 +18,7 @@ export const formatNumber = (value: number) => value.toLocaleString('en-KE');
 
 export const statusTone = (status: string) => {
   if (['approved', 'active', 'success'].includes(status)) return 'success';
-  if (['pending'].includes(status)) return 'warning';
+  if (['pending', 'paused'].includes(status)) return 'warning';
   if (['suspended', 'disabled', 'failed', 'expired'].includes(status)) return 'danger';
   return 'neutral';
 };

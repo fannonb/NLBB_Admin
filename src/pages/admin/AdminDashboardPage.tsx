@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { MetricCard } from '../../components/MetricCard';
-import { adminApi, AdminDashboardData } from '../../lib/api/admin';
+import { adminApi, AdminDashboardData, AdminSubscriptionSettings } from '../../lib/api/admin';
 import {
   AdminError,
   AdminLoading,
@@ -13,6 +14,7 @@ import {
 
 export const AdminDashboardPage = () => {
   const [data, setData] = useState<AdminDashboardData | null>(null);
+  const [settings, setSettings] = useState<AdminSubscriptionSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,7 +22,12 @@ export const AdminDashboardPage = () => {
     setLoading(true);
     setError(null);
     try {
-      setData(await adminApi.getDashboard());
+      const [dashboard, subscriptionSettings] = await Promise.all([
+        adminApi.getDashboard(),
+        adminApi.getSettings().catch(() => null),
+      ]);
+      setData(dashboard);
+      setSettings(subscriptionSettings);
     } catch (err) {
       setError(toErrorMessage(err, 'Could not load admin dashboard.'));
     } finally {
@@ -52,6 +59,16 @@ export const AdminDashboardPage = () => {
       />
 
       {error ? <p className="error-text">{error}</p> : null}
+
+      {settings?.subscriptionsPaused ? (
+        <div className="admin-callout is-paused">
+          <h2>All subscriptions are paused</h2>
+          <p>
+            Providers stay hidden from new bookings until you reinstate them. Remaining paid days are frozen.{' '}
+            <Link to="/admin/settings">Manage in Settings</Link>
+          </p>
+        </div>
+      ) : null}
 
       <div className="stat-grid admin-metrics-grid">
         <MetricCard label="Customers" value={formatNumber(data.metrics.totalUsers)} />

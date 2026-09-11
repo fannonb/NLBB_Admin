@@ -16,6 +16,8 @@ type ProviderAction = {
   provider: AdminProviderRecord;
   status?: AdminProviderStatus;
   delete?: boolean;
+  pauseSubscription?: boolean;
+  resumeSubscription?: boolean;
 };
 
 const FILTERS: Array<{ label: string; value: 'all' | AdminProviderStatus }> = [
@@ -73,6 +75,14 @@ export const AdminProvidersPage = () => {
         await adminApi.deleteProvider(provider.id);
         setProviders((current) => current.filter((item) => item.id !== provider.id));
         showToast('Provider permanently deleted.', 'success');
+      } else if (pendingAction.pauseSubscription) {
+        await adminApi.pauseProviderSubscription(provider.id);
+        await loadProviders();
+        showToast('Subscription paused. Remaining days are frozen.', 'success');
+      } else if (pendingAction.resumeSubscription) {
+        await adminApi.resumeProviderSubscription(provider.id);
+        await loadProviders();
+        showToast('Subscription reinstated with remaining days restored.', 'success');
       } else if (status) {
         const updated = await adminApi.updateProviderStatus(provider.id, status);
         setProviders((current) => current.map((item) => (item.id === provider.id ? { ...item, ...updated, status } : item)));
@@ -91,17 +101,21 @@ export const AdminProvidersPage = () => {
 
   const actionLabel = pendingAction?.delete
     ? 'Delete forever'
-    : pendingAction?.status === 'approved'
-      ? 'Approve'
-      : pendingAction?.status === 'suspended'
-        ? 'Suspend'
-        : 'Update';
+    : pendingAction?.pauseSubscription
+      ? 'Pause subscription'
+      : pendingAction?.resumeSubscription
+        ? 'Reinstate subscription'
+        : pendingAction?.status === 'approved'
+          ? 'Approve'
+          : pendingAction?.status === 'suspended'
+            ? 'Suspend'
+            : 'Update';
 
   return (
     <section className="page-stack admin-page">
       <AdminPageHeader
         title="Providers"
-        subtitle="Review applications, suspend visibility, or permanently delete a provider account."
+        subtitle="Review applications, pause subscriptions without burning remaining days, or suspend a listing."
         action={<button type="button" className="outline-btn" onClick={loadProviders}>Refresh</button>}
       />
 
@@ -145,7 +159,12 @@ export const AdminProvidersPage = () => {
                     </div>
                   </td>
                   <td><StatusBadge status={provider.status} /></td>
-                  <td><StatusBadge status={provider.subscriptionStatus} /></td>
+                  <td>
+                    <StatusBadge status={provider.subscriptionStatus} />
+                    {provider.subscriptionStatus === 'paused' && (provider.remainingDays ?? 0) > 0 ? (
+                      <span className="admin-sub-meta">{provider.remainingDays} day{provider.remainingDays === 1 ? '' : 's'} remaining</span>
+                    ) : null}
+                  </td>
                   <td>{provider.bookingsCount}</td>
                   <td>{formatDateTime(provider.appliedAt)}</td>
                   <td>
@@ -160,6 +179,15 @@ export const AdminProvidersPage = () => {
                           Suspend
                         </button>
                       ) : null}
+                      {provider.subscriptionPauseScope === 'account' || provider.subscriptionPauseScope === 'both' ? (
+                        <button type="button" className="outline-btn" disabled={actioningId === provider.id} onClick={() => setPendingAction({ provider, resumeSubscription: true })}>
+                          Resume plan
+                        </button>
+                      ) : (
+                        <button type="button" className="ghost-btn" disabled={actioningId === provider.id} onClick={() => setPendingAction({ provider, pauseSubscription: true })}>
+                          Pause plan
+                        </button>
+                      )}
                       <button type="button" className="ghost-btn danger-link" disabled={actioningId === provider.id} onClick={() => setPendingAction({ provider, delete: true })}>
                         Delete
                       </button>
@@ -178,10 +206,14 @@ export const AdminProvidersPage = () => {
         message={
           pendingAction?.delete
             ? `Permanently delete ${pendingAction.provider.name}? This wipes the provider listing and the linked owner account. This cannot be undone.`
-            : `${actionLabel} ${pendingAction?.provider.name}?`
+            : pendingAction?.pauseSubscription
+              ? `Pause the subscription for ${pendingAction.provider.name}? Remaining paid days stay frozen until you resume this account.`
+              : pendingAction?.resumeSubscription
+                ? `Reinstate the subscription for ${pendingAction.provider.name}? Remaining paid days start counting again from now.`
+                : `${actionLabel} ${pendingAction?.provider.name}?`
         }
         confirmLabel={actionLabel}
-        destructive={pendingAction?.delete || pendingAction?.status === 'suspended'}
+        destructive={pendingAction?.delete || pendingAction?.status === 'suspended' || pendingAction?.pauseSubscription}
         onDismiss={() => setPendingAction(null)}
         onConfirm={runAction}
       />
