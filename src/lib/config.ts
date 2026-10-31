@@ -36,8 +36,12 @@ const buildApiBaseUrls = () => {
   const buildTimeBaseUrl = (import.meta as ImportMeta & { env?: ImportMetaEnvShape }).env?.VITE_API_BASE_URL;
   appendUnique(urls, buildTimeBaseUrl);
   appendUnique(urls, window.__NLBB_ENV__?.VITE_API_BASE_URL);
-  appendUnique(urls, 'http://localhost:4000/api');
-  appendUnique(urls, 'http://127.0.0.1:4000/api');
+  if (import.meta.env.PROD) {
+    if (urls.length === 0) appendUnique(urls, new URL('/api', window.location.origin).toString());
+  } else {
+    appendUnique(urls, 'http://localhost:4000/api');
+    appendUnique(urls, 'http://127.0.0.1:4000/api');
+  }
   return urls;
 };
 

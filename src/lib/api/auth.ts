@@ -4,8 +4,6 @@ import { fetchWithApiBaseUrlFallback } from './baseUrl';
 import type { BackendUserProfile, UserRole } from '../../types';
 
 export interface AuthSessionResponse {
-  accessToken: string;
-  refreshToken: string;
   expiresIn: number;
   user: BackendUserProfile | null;
 }

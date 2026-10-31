@@ -94,7 +94,14 @@ export const LoginPage = () => {
 
           <p className="auth-admin-fine-print">
             By continuing, you agree to NLBB&apos;s{' '}
-            <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
+            <a href="/terms" target="_blank" rel="noreferrer">
+              Terms of Service
+            </a>{' '}
+            and{' '}
+            <a href="/privacy" target="_blank" rel="noreferrer">
+              Privacy Policy
+            </a>
+            .
           </p>
         </form>
       </div>

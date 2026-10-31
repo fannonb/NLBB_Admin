@@ -22,7 +22,9 @@ export const fetchWithApiBaseUrlFallback = async (
   for (const baseUrl of API_BASE_URLS) {
     attemptedBaseUrls.push(baseUrl);
     try {
-      const response = await fetch(joinPath(baseUrl, path), init);
+      const headers = new Headers(init?.headers);
+      headers.set('X-NLBB-Client', 'web');
+      const response = await fetch(joinPath(baseUrl, path), { ...init, headers, credentials: 'include' });
       return {
         response,
         resolvedBaseUrl: baseUrl,

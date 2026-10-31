@@ -1,3 +1,5 @@
+import { PrivacyPolicyPage, TermsOfServicePage } from '../pages/legal/LegalDocumentPage';
+import { DeleteAccountPage } from '../pages/legal/DeleteAccountPage';
 import React from 'react';
 import { Navigate, createBrowserRouter } from 'react-router-dom';
 import { ProtectedRoute } from '../components/ProtectedRoute';
@@ -16,6 +18,9 @@ import { AdminCategoriesPage } from '../pages/admin/AdminCategoriesPage';
 import { AdminSettingsPage } from '../pages/admin/AdminSettingsPage';
 
 export const router = createBrowserRouter([
+  { path: '/privacy', element: <PrivacyPolicyPage /> },
+  { path: '/terms', element: <TermsOfServicePage /> },
+  { path: '/delete-account', element: <DeleteAccountPage /> },
   {
     path: '/',
     element: <RootRedirect />,

@@ -1,3 +1,4 @@
+import { showToast } from './Toast';
 import React, { useState } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
@@ -45,9 +46,18 @@ export const RoleLayout = ({ role }: RoleLayoutProps) => {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  const [signingOut, setSigningOut] = useState(false);
   const handleLogout = async () => {
-    await logout();
-    navigate('/login', { replace: true });
+    if (signingOut) return;
+    setSigningOut(true);
+    try {
+      await logout();
+      navigate('/login', { replace: true });
+    } catch {
+      showToast('Unable to sign out. Check your connection and try again.', 'error');
+    } finally {
+      setSigningOut(false);
+    }
   };
 
   const links = roleLinks[role];
@@ -68,7 +78,7 @@ export const RoleLayout = ({ role }: RoleLayoutProps) => {
         </Link>
         <div className="topbar-actions">
           <span className="user-chip">{user?.name ?? 'Account'}</span>
-          <button type="button" className="ghost-btn logout-btn" onClick={handleLogout}>
+          <button type="button" className="ghost-btn logout-btn" disabled={signingOut} onClick={handleLogout}>
             Logout
           </button>
         </div>

@@ -1,5 +1,5 @@
 import { API_BASE_URLS } from '../config';
-import { getAccessToken, getRefreshToken, setStoredSession } from '../authSession';
+import { clearStoredSession } from '../authSession';
 import { fetchWithApiBaseUrlFallback } from './baseUrl';
 
 interface ApiErrorPayload {
@@ -15,8 +15,6 @@ interface ApiResponseEnvelope<T> {
 }
 
 interface RefreshPayload {
-  accessToken: string;
-  refreshToken: string;
   expiresIn: number;
 }
 
@@ -46,16 +44,12 @@ const defaultHeaders = {
   'Content-Type': 'application/json',
 };
 
-const refreshStoredSession = async (): Promise<RefreshPayload | null> => {
-  const refreshToken = await getRefreshToken();
-  if (!refreshToken) {
-    return null;
-  }
-
+let refreshPromise: Promise<RefreshPayload | null> | null = null;
+const performRefresh = async (): Promise<RefreshPayload | null> => {
   const { response } = await fetchWithApiBaseUrlFallback('auth/refresh', {
     method: 'POST',
     headers: defaultHeaders,
-    body: JSON.stringify({ refreshToken }),
+    body: JSON.stringify({}),
   });
 
   if (!response) {
@@ -70,12 +64,16 @@ const refreshStoredSession = async (): Promise<RefreshPayload | null> => {
   }
 
   if (!response.ok || !payload?.success) {
-    await setStoredSession(null);
+    await clearStoredSession();
     return null;
   }
 
-  await setStoredSession(payload.data);
   return payload.data;
+};
+
+const refreshStoredSession = () => {
+  if (!refreshPromise) refreshPromise = performRefresh().finally(() => { refreshPromise = null; });
+  return refreshPromise;
 };
 
 const request = async <T>(
@@ -84,13 +82,11 @@ const request = async <T>(
   body?: unknown,
   retryOnUnauthorized = true
 ) => {
-  const token = await getAccessToken();
   const { response, resolvedBaseUrl, attemptedBaseUrls, errors: networkErrors } =
     await fetchWithApiBaseUrlFallback(path, {
       method,
       headers: {
         ...defaultHeaders,
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
       body: body === undefined ? undefined : JSON.stringify(body),
     });
@@ -109,7 +105,7 @@ const request = async <T>(
     payload = null;
   }
 
-  if (response.status === 401 && retryOnUnauthorized && !path.startsWith('auth/')) {
+  if (response.status === 401 && retryOnUnauthorized && path !== 'auth/refresh') {
     const refreshed = await refreshStoredSession();
     if (refreshed) {
       return request<T>(method, path, body, false);

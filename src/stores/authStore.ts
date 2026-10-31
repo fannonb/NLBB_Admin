@@ -1,6 +1,7 @@
 import { create } from 'zustand';
+import { ApiClientError } from '../lib/api/client';
 import { authApi, AuthSessionResponse } from '../lib/api/auth';
-import { clearStoredSession, getStoredSession, setStoredSession } from '../lib/authSession';
+import { clearStoredSession } from '../lib/authSession';
 import type { BackendUserProfile, User, UserRole } from '../types';
 
 interface SignupPayload {
@@ -33,14 +34,6 @@ const mapBackendUserToAppUser = (profile: BackendUserProfile): User => ({
   location: profile.location ?? undefined,
 });
 
-const persistSession = async (session: AuthSessionResponse) => {
-  await setStoredSession({
-    accessToken: session.accessToken,
-    refreshToken: session.refreshToken,
-    expiresIn: session.expiresIn,
-  });
-};
-
 const applySession = async (set: (state: Partial<AuthState>) => void, session: AuthSessionResponse) => {
   if (!session.user) {
     await clearStoredSession();
@@ -48,7 +41,7 @@ const applySession = async (set: (state: Partial<AuthState>) => void, session: A
     return null;
   }
 
-  await persistSession(session);
+  await clearStoredSession();
   const user = mapBackendUserToAppUser(session.user);
   set({ user, isLoggedIn: true });
   return user;
@@ -78,12 +71,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
     initializePromise = (async () => {
       try {
-        const session = await getStoredSession();
-        if (!session) {
-          set({ user: null, isLoggedIn: false, isReady: true, isInitializing: false });
-          return;
-        }
-
+        await clearStoredSession(); // Discard legacy localStorage credentials.
         const profile = await authApi.getMe();
         if (!profile) {
           await clearStoredSession();
@@ -135,8 +123,10 @@ export const useAuthStore = create<AuthState>((set) => ({
   logout: async () => {
     try {
       await authApi.logout();
-    } catch {
-      // We always clear local session, even if backend logout fails.
+    } catch (error) {
+      // HttpOnly cookies can only be cleared by the server. Do not report a
+      // successful logout after an outage while the cookie remains active.
+      if ((error as ApiClientError).status !== 401) throw error;
     }
     await clearStoredSession();
     set({ user: null, isLoggedIn: false });
